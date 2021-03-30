@@ -13,3 +13,4 @@ LOG_FILE = pathlib.Path("log/monke.log")
 
 class Channels(NamedTuple):
     general = 825733815456104451
+    polls = 825738568910635019
