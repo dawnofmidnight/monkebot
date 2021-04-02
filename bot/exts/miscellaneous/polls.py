@@ -14,7 +14,9 @@ class Polls(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def _get_winning_options(options: dict[int, str], reactions: list[discord.Reaction]) -> list[str]:
+    def _get_winning_options(
+        options: dict[int, str], reactions: list[discord.Reaction]
+    ) -> list[str]:
         """Get winning option numbers based on reactions applied."""
 
         winners = []
@@ -73,7 +75,7 @@ class Polls(commands.Cog):
         if len(winners) == 1:
             await channel.send(f"Poll won by: {winners[0]}")
         else:
-            await channel.send("Poll drawn between:\n"+"\n".join(winners))
+            await channel.send("Poll drawn between:\n" + "\n".join(winners))
 
 
 def setup(bot: commands.Bot) -> None:
