@@ -13,6 +13,24 @@ class Polls(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @staticmethod
+    def _get_winning_options(
+        options: dict[int, str], reactions: list[discord.Reaction]
+    ) -> list[str]:
+        """Get winning option numbers based on reactions applied."""
+
+        winners = []
+        max_count = -1
+
+        for reaction in reactions:
+            if reaction.count > max_count:
+                max_count = reaction.count
+                winners = [options[int(reaction.emoji[0])]]
+            elif reaction.count == max_count:
+                winners.append(options[int(reaction.emoji[0])])
+
+        return winners
+
     @commands.command()
     async def poll(
         self,
@@ -27,7 +45,7 @@ class Polls(commands.Cog):
         channel = self.bot.get_channel(constants.Channels.polls)
         topic, args = args.split(":")  # separate poll topic and options
 
-        options = {i + 1: option for i, option in enumerate(args.split("|"))}
+        options = {i + 1: option.strip() for i, option in enumerate(args.split("|"))}
 
         embed = discord.Embed(title="Poll")
 
@@ -52,9 +70,12 @@ class Polls(commands.Cog):
             for reaction in (await channel.fetch_message(embed_message.id)).reactions
             if reaction.emoji in used_reactions
         ]
-        winner = max(reactions, key=lambda reaction: reaction.count)
+        winners = self._get_winning_options(options, reactions)
 
-        await channel.send(f"Poll won by: {options[int(winner.emoji[0])]}")
+        if len(winners) == 1:
+            await channel.send(f"Poll won by: {winners[0]}")
+        else:
+            await channel.send("Poll drawn between:\n" + "\n".join(winners))
 
 
 def setup(bot: commands.Bot) -> None:
